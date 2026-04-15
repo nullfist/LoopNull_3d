@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loop Architect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.70.0/dist/phaser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+</head>
+<body>
+    <!-- Phaser canvas (title / tutorial / trailer) -->
+    <div id="phaser-container"></div>
+
+    <!-- Three.js canvas (gameplay) -->
+    <div id="three-container" style="display:none;">
+        <canvas id="three-canvas"></canvas>
+
+        <!-- HUD -->
+        <div id="hud">
+            <div id="hud-left">
+                <span id="hud-level">LEVEL 1</span>
+                <span id="hud-loop">Loop 1 / 3</span>
+            </div>
+            <div id="hud-centre">
+                <span id="hud-steps">Steps 0 / 40</span>
+                <div id="hud-pips"></div>
+            </div>
+            <button id="hud-pause">⏸</button>
+        </div>
+
+        <!-- D-pad -->
+        <div id="dpad">
+            <button class="dpad-btn" id="btn-up">▲</button>
+            <div class="dpad-row">
+                <button class="dpad-btn" id="btn-left">◀</button>
+                <div class="dpad-centre"></div>
+                <button class="dpad-btn" id="btn-right">▶</button>
+            </div>
+            <button class="dpad-btn" id="btn-down">▼</button>
+        </div>
+
+        <!-- Action buttons -->
+        <div id="action-btns">
+            <button class="action-btn" id="btn-reset">R<br><small>LOOP</small></button>
+            <button class="action-btn" id="btn-undo">U<br><small>UNDO</small></button>
+        </div>
+
+        <!-- Pause overlay -->
+        <div id="pause-overlay" style="display:none;">
+            <div id="pause-box">
+                <h2>PAUSED</h2>
+                <button class="pause-menu-btn" id="pause-resume">▶  Resume</button>
+                <button class="pause-menu-btn" id="pause-restart">↺  Restart Level</button>
+                <button class="pause-menu-btn" id="pause-title">⌂  Main Menu</button>
+            </div>
+        </div>
+
+        <!-- Dialogue -->
+        <div id="dialogue-box" style="display:none;">
+            <div id="dialogue-text"></div>
+            <span id="dialogue-cursor">▼</span>
+        </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+</body>
+</html>

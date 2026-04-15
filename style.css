@@ -1,0 +1,294 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+
+body {
+    background: radial-gradient(circle at center, #1f2a44 0%, #0b1220 60%, #04080f 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100dvh;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #94a3b8;
+}
+
+/* ── Phaser container ─────────────────────────────────────────── */
+#phaser-container canvas { display: block; image-rendering: auto; }
+
+/* ── Three.js container — fluid, fits any screen ─────────────── */
+#three-container {
+    position: relative;
+    /* Maintain 576:640 aspect ratio, fill available space */
+    width: min(576px, 100vw, calc(100dvh * 0.9));
+    height: min(640px, 100dvh, calc(100vw * 1.11));
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 40%, #1f2a44 0%, #0b1220 55%, #04080f 100%);
+}
+
+#three-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ── HUD ──────────────────────────────────────────────────────── */
+#hud {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 52px;
+    background: linear-gradient(180deg, rgba(11,18,32,0.98) 0%, rgba(18,26,43,0.94) 100%);
+    border-bottom: 1px solid rgba(42,58,95,0.7);
+    box-shadow: 0 1px 10px rgba(0,229,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    padding-top: env(safe-area-inset-top, 0px);
+    z-index: 10;
+}
+
+#hud-left { display: flex; flex-direction: column; gap: 2px; }
+#hud-level {
+    font-size: 13px; font-weight: bold;
+    color: #00e5ff;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 6px rgba(0,229,255,0.4);
+}
+#hud-loop  { font-size: 10px; color: #4a7aaa; letter-spacing: 0.04em; }
+
+#hud-centre { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+#hud-steps  { font-size: 10px; color: #4a7aaa; letter-spacing: 0.04em; }
+#hud-pips   { display: flex; gap: 5px; }
+.hud-pip {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #0d1f3a;
+    border: 1px solid #1e3a5f;
+    transition: background 0.25s, box-shadow 0.25s;
+}
+.hud-pip.active {
+    background: #00e5ff;
+    box-shadow: 0 0 6px rgba(0,229,255,0.8);
+}
+
+#hud-pause {
+    background: rgba(0,229,255,0.06);
+    border: 1px solid rgba(0,229,255,0.2);
+    color: #4a7aaa;
+    font-size: 15px;
+    width: 40px; height: 34px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+#hud-pause:hover { background: rgba(0,229,255,0.14); color: #00e5ff; }
+
+/* ── D-pad — scales with container ───────────────────────────── */
+#dpad {
+    position: absolute;
+    bottom: max(72px, env(safe-area-inset-bottom, 0px) + 72px);
+    left: 18px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 3px;
+    z-index: 10;
+}
+.dpad-row { display: flex; align-items: center; gap: 3px; }
+.dpad-centre {
+    width: 44px; height: 44px;
+    background: rgba(0,229,255,0.04);
+    border: 1px solid rgba(0,229,255,0.1);
+    border-radius: 6px;
+}
+.dpad-btn {
+    width: 44px; height: 44px;
+    background: rgba(18,26,43,0.92);
+    border: 1px solid rgba(42,58,95,0.8);
+    color: rgba(0,229,255,0.45);
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.1s, color 0.1s, box-shadow 0.1s;
+    /* Larger touch target without changing visual size */
+    padding: 0;
+    min-width: 44px; min-height: 44px;
+}
+.dpad-btn:active {
+    background: rgba(0,229,255,0.14);
+    color: #00e5ff;
+    box-shadow: 0 0 10px rgba(0,229,255,0.3);
+}
+
+/* ── Action buttons ───────────────────────────────────────────── */
+#action-btns {
+    position: absolute;
+    bottom: max(72px, env(safe-area-inset-bottom, 0px) + 72px);
+    right: 18px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 10px;
+    z-index: 10;
+}
+.action-btn {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    font-size: 16px; font-weight: bold;
+    line-height: 1.1;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    text-align: center;
+    transition: box-shadow 0.15s, transform 0.1s;
+    min-width: 44px; min-height: 44px;
+}
+.action-btn:active { transform: scale(0.93); }
+#btn-reset {
+    background: rgba(58,10,10,0.9);
+    border: 1.5px solid rgba(252,165,165,0.3);
+    color: #fca5a5;
+}
+#btn-reset:active { box-shadow: 0 0 14px rgba(252,100,100,0.5); }
+#btn-undo {
+    background: rgba(10,26,58,0.9);
+    border: 1.5px solid rgba(0,229,255,0.2);
+    color: #4a7aaa;
+}
+#btn-undo:active { box-shadow: 0 0 14px rgba(0,229,255,0.3); }
+.action-btn small { font-size: 7px; color: #334155; display: block; letter-spacing: 0.06em; }
+
+/* ── Pause overlay ────────────────────────────────────────────── */
+#pause-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(11,18,32,0.9);
+    backdrop-filter: blur(5px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 50;
+}
+#pause-box {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    padding: 32px 28px;
+    background: rgba(18,26,43,0.97);
+    border: 1px solid rgba(42,58,95,0.9);
+    border-radius: 10px;
+    box-shadow: 0 0 32px rgba(0,229,255,0.06);
+    width: min(280px, 90%);
+}
+#pause-box h2 {
+    font-size: 28px; color: #00e5ff; font-weight: bold;
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 16px rgba(0,229,255,0.6);
+    margin-bottom: 6px;
+}
+.pause-menu-btn {
+    width: 100%; height: 44px;
+    background: rgba(30,58,95,0.6);
+    border: 1px solid rgba(0,229,255,0.15);
+    color: #94a3b8;
+    font-size: 13px;
+    border-radius: 6px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    min-height: 44px;
+}
+.pause-menu-btn:hover, .pause-menu-btn:active {
+    background: rgba(45,90,142,0.8);
+    color: #00e5ff;
+    box-shadow: 0 0 10px rgba(0,229,255,0.15);
+}
+
+/* ── Dialogue box ─────────────────────────────────────────────── */
+#dialogue-box {
+    position: absolute;
+    left: 50%; transform: translateX(-50%);
+    bottom: 168px;
+    width: min(260px, 80%);
+    background: rgba(18,26,43,0.97);
+    border: 1px solid rgba(42,58,95,0.9);
+    border-top: 1px solid rgba(0,229,255,0.25);
+    border-radius: 8px;
+    padding: 12px 16px 10px;
+    z-index: 20;
+    font-size: 12px;
+    color: #c8d8f0;
+    text-align: center;
+    line-height: 1.6;
+    box-shadow: 0 0 16px rgba(0,229,255,0.08);
+    cursor: pointer;
+    animation: dialogueFadeIn 0.2s ease-out;
+}
+@keyframes dialogueFadeIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+#dialogue-cursor {
+    display: block;
+    font-size: 8px;
+    color: #00e5ff;
+    margin-top: 5px;
+    animation: blink 0.55s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── Win overlay ──────────────────────────────────────────────── */
+#win-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(11,18,32,0.88);
+    backdrop-filter: blur(6px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 14px;
+    z-index: 60;
+    animation: winFadeIn 0.4s ease-out;
+    padding: 24px;
+}
+@keyframes winFadeIn { from { opacity: 0; } to { opacity: 1; } }
+#win-overlay h1 {
+    font-size: clamp(20px, 5vw, 26px); color: #00e5ff; font-weight: bold;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 24px rgba(0,229,255,0.7);
+    text-align: center;
+}
+#win-overlay p {
+    font-size: clamp(12px, 3vw, 14px); color: #94a3b8;
+    text-align: center; white-space: pre-line; line-height: 1.7;
+}
+#win-btn {
+    margin-top: 6px;
+    width: min(164px, 80%); height: 44px;
+    background: #00e5ff; color: #04080f;
+    font-size: 14px; font-weight: bold;
+    border: none; border-radius: 6px; cursor: pointer;
+    letter-spacing: 0.06em;
+    box-shadow: 0 0 20px rgba(0,229,255,0.4);
+    transition: background 0.2s, box-shadow 0.2s;
+    min-height: 44px;
+}
+#win-btn:hover, #win-btn:active {
+    background: #67e8f9;
+    box-shadow: 0 0 30px rgba(0,229,255,0.6);
+}
+
+/* ── Small screen adjustments (phones < 400px wide) ──────────── */
+@media (max-width: 400px) {
+    .dpad-btn, .dpad-centre { width: 40px; height: 40px; }
+    .action-btn { width: 46px; height: 46px; font-size: 14px; }
+    #hud-level { font-size: 11px; }
+    #hud-loop, #hud-steps { font-size: 9px; }
+}
+
+/* ── Landscape phones — shrink controls ──────────────────────── */
+@media (max-height: 500px) {
+    #dpad { bottom: 8px; }
+    #action-btns { bottom: 8px; }
+    .dpad-btn, .dpad-centre { width: 36px; height: 36px; font-size: 13px; }
+    .action-btn { width: 40px; height: 40px; font-size: 13px; }
+    #dialogue-box { bottom: 100px; }
+}
